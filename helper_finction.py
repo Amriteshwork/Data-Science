@@ -33,6 +33,27 @@ all_data = []
 
 while url:
     response = requests.get(url)
+  
+########################################################################################################################
+
+## print the no. of arg. in simple transformer lib
+arg_values = []
+
+pd.set_option('display.max_rows', 80)
+
+# For all of the arguments...
+for arg in dir(model.args):
+    
+    # Skip over the special attributes and any functions.
+    if (not arg[0:2] == '__') and (not callable(getattr(model.args, arg))):
+    
+        # Store the argument and its value as a tuple.
+        arg_values.append((arg, str(getattr(model.args, arg))))
+
+# Store as a dataframe just to get the pretty printout.
+df_args = pd.DataFrame(arg_values)        
+
+df_args
 
     try:
         data = json.loads(response.content)
