@@ -87,3 +87,17 @@ for arg in dir(model.args):
 df_args = pd.DataFrame(arg_values)        
 
 df_args
+
+
+#######################################################################################################################################
+
+## Download CSV data from GitHub
+import requests
+from io import StringIO
+
+url = "https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/csv/cities.csv"
+headers = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:66.0) Gecko/20100101 Firefox/66.0"}
+req = requests.get(url, headers=headers)
+data = StringIO(req.text)
+
+dataframe = pd.read_csv(data)
