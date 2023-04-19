@@ -124,3 +124,40 @@ def delete_columns(folder_path):
                 new_filename = os.path.splitext(filename)[0] + '_updated.csv'
                 new_path = os.path.join(root, new_filename)
                 df.to_csv(new_path, index=False)
+                
+                
+                
+################################################################################################################################################
+
+## combine different csv file present in sub-folder
+
+import os
+import pandas as pd
+
+def combine_csv_files(parent_folder, output_file):
+    # create an empty list to store dataframes
+    dfs = []
+
+    # loop through each subfolder in the parent folder
+    for subfolder in os.listdir(parent_folder):
+        # check if the current item is a folder
+        if os.path.isdir(os.path.join(parent_folder, subfolder)):
+            # get a list of all files in the subfolder
+            file_list = os.listdir(os.path.join(parent_folder, subfolder))
+
+            # filter the list to only include files ending in "_updated.csv"
+            file_list = [f for f in file_list if f.endswith("_updated.csv")]
+
+            # loop through each file, read it into a dataframe, and append it to the list of dataframes
+            for file in file_list:
+                df = pd.read_csv(os.path.join(parent_folder, subfolder, file))
+                dfs.append(df)
+
+    # concatenate all dataframes in the list into a single dataframe
+    combined_df = pd.concat(dfs, ignore_index=True)
+
+    # write the combined dataframe to a new csv file
+    combined_df.to_csv(output_file, index=False)
+
+    return combined_df
+
