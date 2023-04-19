@@ -101,3 +101,26 @@ req = requests.get(url, headers=headers)
 data = StringIO(req.text)
 
 dataframe = pd.read_csv(data)
+
+
+##########################################################################################################################################
+
+## Delete the column from the subfolder with column name specified
+
+def delete_columns(folder_path):
+    # loop through all files and subfolders recursively
+    for root, dirs, files in os.walk(folder_path):
+        for filename in files:
+            if filename.endswith('.csv'):
+                # read the csv file into a pandas dataframe
+                df = pd.read_csv(os.path.join(root, filename))
+                # keep only the first and third column, and rename them
+                df = df.iloc[:, [0, 2]]
+                df = df.rename(columns={df.columns[0]: 'district', df.columns[1]: 'city'})
+                # add a new column "state" and populate it with the subfolder name
+                state = os.path.basename(root)
+                df['state'] = state
+                # save the updated dataframe as a new csv file with '_updated' suffix
+                new_filename = os.path.splitext(filename)[0] + '_updated.csv'
+                new_path = os.path.join(root, new_filename)
+                df.to_csv(new_path, index=False)
