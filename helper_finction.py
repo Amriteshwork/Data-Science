@@ -25,11 +25,12 @@ def count_words_in_column(column):
 import requests
 import json
 import csv
+import pandas as pd
 
-url = 'https://newsdata.io/api/1/archive?apikey=pub_xxxxx&q=news'
+url = 'https://xxxx'
 
-# get all data
 all_data = []
+base_url = url 
 
 while url:
     response = requests.get(url)
@@ -44,7 +45,7 @@ while url:
             all_data.append(item)
 
         if data['nextPage']:
-            url = f"{url}&page={data['nextPage']}"
+            url = f"{base_url}&page={data['nextPage']}"
             print(url)
         else:
             url = None
@@ -59,9 +60,6 @@ if all_data:
             writer.writerow(item)
 else:
     print("Error: No data retrieved")
-    
-    
-    
     
     
     
