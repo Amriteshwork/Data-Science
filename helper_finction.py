@@ -60,6 +60,51 @@ if all_data:
             writer.writerow(item)
 else:
     print("Error: No data retrieved")
+##########################################################################################################################
+
+## scrap the file and save each file as csv
+
+import requests
+import json
+import csv
+
+url = 'https://xxx'
+
+base_url = url 
+page_number = 1
+
+while url:
+    response = requests.get(url)
+
+    try:
+        data = json.loads(response.content)
+    except json.JSONDecodeError:
+        print("Error: Invalid JSON")
+        break
+    else:
+        all_data = data['results']
+        
+        if all_data:
+            keys = all_data[0].keys()
+            
+            filename = f"data_given/content_{page_number}.csv"
+
+            with open(filename, "w", newline='') as f:
+                writer = csv.DictWriter(f, fieldnames=keys)
+                writer.writeheader()
+                writer.writerows(all_data)
+                # print(f"CSV file '{filename}' created.")
+
+        if data['nextPage']:
+            page_number += 1
+            url = f"{base_url}&page={data['nextPage']}"
+        else:
+            url = False
+
+if not all_data:
+    print("Error: No data retrieved")
+
+
     
     
     
