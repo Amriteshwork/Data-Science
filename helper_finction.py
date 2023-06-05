@@ -204,3 +204,25 @@ def combine_csv_files(parent_folder, output_file):
 
     return combined_df
 
+
+##############################################################################################################################################################################
+
+## rename the files with the subfolder_name in it
+
+import os
+
+def rename_files_with_subfolder_name(root_dir):
+    for root, dirs, files in os.walk(root_dir):
+        for file in files:
+            old_path = os.path.join(root, file)
+            folder_name = os.path.basename(root)
+            file_name, file_ext = os.path.splitext(file)
+            new_name = file_name + "_" + folder_name + file_ext
+            new_path = os.path.join(root, new_name)
+            os.rename(old_path, new_path)
+
+root_directory = "..."
+
+rename_files_with_subfolder_name(root_directory)
+
+
