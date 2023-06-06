@@ -226,3 +226,88 @@ root_directory = "..."
 rename_files_with_subfolder_name(root_directory)
 
 
+###################################################################################################################################################################################
+
+## use openai for information fetching
+
+import openai
+import re
+import pandas as pd
+import time
+import config
+
+start = time.time()
+
+openai.api_key = '...'
+
+def extract_list_from_string(string):
+    pattern = r'\[([^\[\]]+)\]'
+    matches = re.findall(pattern, string)
+    if matches:
+        list_string = matches[0]
+        elements = [elem.strip().strip('"') for elem in list_string.split(',')]
+        return elements
+    else:
+        return []
+
+def ask_question(question, species):
+    try:
+        response = openai.ChatCompletion.create(
+            model='gpt-3.5-turbo',
+            messages=[
+                {'role': 'system', 'content': f'You are a botanist researching various plant species and their common names in different languages. The plant belongs to the genus {species[0].split(" ")[0]} and its scientific name is {species}. You want to find out its common name in Spanish?'},
+                {'role': 'user', 'content': question}
+            ],
+            max_tokens=500,
+            temperature=0.2
+        )
+
+        answer = response.choices[0].message.content.strip()
+        return answer
+
+    except openai.error.RateLimitError as e:
+        retry_time = e.retry_after if hasattr(e, 'retry_after') else 70
+        print(f"Rate limit exceeded. Retrying in {retry_time} seconds...")
+        time.sleep(retry_time)
+        return ask_question(question, species)
+
+    except openai.error.APIError as e:
+        retry_time = e.retry_after if hasattr(e, 'retry_after') else 70
+        print(f"API error occurred. Retrying in {retry_time} seconds...")
+        time.sleep(retry_time)
+        return ask_question(question, species)
+
+    except OSError as e:
+        retry_time = 5  # Adjust the retry time as needed
+        print(f"Connection error occurred: {e}. Retrying in {retry_time} seconds...")
+        time.sleep(retry_time)
+        return ask_question(question, species)
+
+spe = config.name_list
+
+for species in spe:
+    query = f"Give the common names of {species} in Spanish? Give the output in python list."
+    # query = f"I would like to know common name of {species} only in Spanish. Give the output in python list."
+
+    answer = ask_question(query, species=species)
+    print(f"Common name of the {species} are {answer}")
+    row_dict = {}
+    row_dict["scientific_name"] = species
+    list_val = extract_list_from_string(answer)
+    print(list_val)
+    
+    if len(list_val) >= 1 and isinstance(list_val, list):
+        list_val = list(set(list_val))
+        empty = ', '.join(list_val)
+        for comn_name in list_val:
+            print(comn_name)
+    else:
+        continue
+    row_dict["common_name"] = empty
+    df = pd.DataFrame.from_dict([row_dict])
+    df.to_csv("...", mode='a', header=False, index=False)
+    time.sleep(4)
+
+print(f"The average required time per species is {(time.time() - start) / len(spe)} seconds")
+
+
