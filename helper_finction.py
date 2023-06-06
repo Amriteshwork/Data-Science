@@ -250,12 +250,12 @@ def extract_list_from_string(string):
     else:
         return []
 
-def ask_question(question, species):
+def ask_question(question, i):
     try:
         response = openai.ChatCompletion.create(
             model='gpt-3.5-turbo',
             messages=[
-                {'role': 'system', 'content': f'You are a botanist researching various plant species and their common names in different languages. The plant belongs to the genus {species[0].split(" ")[0]} and its scientific name is {species}. You want to find out its common name in Spanish?'},
+                {'role': 'system', 'content': f'__context__'},
                 {'role': 'user', 'content': question}
             ],
             max_tokens=500,
@@ -283,16 +283,16 @@ def ask_question(question, species):
         time.sleep(retry_time)
         return ask_question(question, species)
 
-spe = config.name_list
+spe = []
 
-for species in spe:
-    query = f"Give the common names of {species} in Spanish? Give the output in python list."
+for i in spe:
+    query = f"__question__? Give the output in python list."
     # query = f"I would like to know common name of {species} only in Spanish. Give the output in python list."
 
-    answer = ask_question(query, species=species)
-    print(f"Common name of the {species} are {answer}")
+    answer = ask_question(query, i)
+    print(f"Common name of the {i} are {answer}")
     row_dict = {}
-    row_dict["scientific_name"] = species
+    row_dict["scientific_name"] = i
     list_val = extract_list_from_string(answer)
     print(list_val)
     
