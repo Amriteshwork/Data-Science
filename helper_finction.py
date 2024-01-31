@@ -311,3 +311,26 @@ for i in spe:
 print(f"The average required time per species is {(time.time() - start) / len(spe)} seconds")
 
 
+
+################################## Freeze the text model and print the frozen and non frozen ###############################
+
+# freeze
+for name, param in my_model.named_parameters():
+
+    if 'encoder.layer' in name:
+
+        layer_num = int(name.split('.')[3])
+        if layer_num < 10:
+            param.requires_grad = False
+    if 'embeddings' in name:
+        param.requires_grad = False
+
+# print frozen
+max_name_length = max(len(name) for name, _ in custom_model.named_parameters())
+for name, param in custom_model.named_parameters():
+    frozen_status = "Frozen" if not param.requires_grad else "Not Frozen"
+
+    color_code = "\033[91m" if not param.requires_grad else "\033[92m"
+    reset_code = "\033[0m"
+    
+    print(f'{name.ljust(max_name_length)}: {color_code}{frozen_status}{reset_code}')
