@@ -334,3 +334,12 @@ for name, param in custom_model.named_parameters():
     reset_code = "\033[0m"
     
     print(f'{name.ljust(max_name_length)}: {color_code}{frozen_status}{reset_code}')
+
+
+
+
+##################################################################################################
+
+# command to quantize NLLB model using ctranslate2
+ct2-transformers-converter --model facebook/nllb-200-distilled-600M --quantization float16 --output_dir nllb-200-distilled-600M-float16
+
